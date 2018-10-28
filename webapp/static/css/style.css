@@ -1,0 +1,110 @@
+body{
+    font-family: "Open Sans", sans-serif;
+}
+
+nav {
+    position: relative;
+    height: 95px;
+    background-color: white;
+}
+
+nav img.logo {
+    padding: 10px 0 0 25px;
+    width: 140px;
+    z-index: 10;
+}
+
+nav a.login {
+    position: absolute;
+    right: 0;
+    padding: 10px 25px 0 0;
+    color: #002369 !important;
+}
+
+h3.title {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    text-align: center;
+    color: #002369 !important;
+}
+
+h5 {
+    top: 0;
+    width: 100%;
+    text-align: center;
+    color: #002369 !important;
+}
+h6 {
+    color: #002369 !important;
+    padding-right: 1.5em;
+    display: inline;
+}
+.currencies {
+    text-align: right;
+    padding: 1em 1em 0 0;
+}
+
+.section-content {
+	position: absolute;
+    width: 992px;
+    margin: auto;
+    left: 0;
+    right: 0;
+}
+.progress {
+	margin: 2.5rem 0 1rem 0;
+}
+
+.left {
+    position: absolute;
+    top: 140px;
+    bottom: 0;
+    width: 50%;
+    z-index: -1;
+    padding: 0 15px 0 15px;   
+}
+
+.right {
+    position: absolute;
+    top: 140px;
+    bottom: 0;
+    left: 50%;
+    right: 0;
+    z-index: -1;
+    padding: 0 15px 0 15px;
+}
+
+.productName {
+    color: #002369 !important;
+    font-size: 20px;
+}
+
+.collection-item {
+    position: relative;
+}
+.collection .btn-floating.add {
+    position: absolute;
+    right: 50px;
+    top: 12px;
+    background-color: #002369 !important;
+}
+.collection .btn-floating.remove {
+    position: absolute;
+    right: 5px;
+    top: 12px;
+    background-color: #002369 !important;
+}
+
+.qty {
+    position: absolute;
+    background-color: #002369 !important;
+    color: white;
+    width: 30px;
+    height: 30px;
+    top: 3px;
+    right: 3px;
+    border-radius: 50%;
+    text-align: center;
+    padding-top: 4px;
+}

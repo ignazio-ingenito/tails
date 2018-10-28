@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="{{html_lang}}" ng-app="tails">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <!-- meta info -->
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta name="keywords" content="tails.com">
+    <meta name="description" content="tails.com - pricing test">
+    <meta name="author" content="Ignazio Ingenito">
+    <meta name="template" content="{{ self._TemplateReference__context.name }}"/>
+    <meta name="robots" content="noindex">
+    <!-- Title -->
+    <title>tails.com - pricing test</title>
+    <!-- Versions -->
+    {% set angular_ver = '1.6.7' %}
+    {% set jquery_ver = '3.2.1' %}
+    {% set materialize_ver = '0.100.2' %}
+    {% set moment_ver = '2.22.1' %}
+    <!-- common css  -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css"/>
+    <link href="//cdnjs.cloudflare.com/ajax/libs/materialize/{{materialize_ver}}/css/materialize.css" type="text/css"
+          rel="stylesheet" media="screen,projection"/>
+    <link href="//fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="//fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="/static/css/style.css" type="text/css" rel="stylesheet"/>
+
+    <!-- specific page css  -->
+    {% block style_block %}{# page-specific CSS #}{% endblock %}
+
+    <!-- specific defer-incapable js block  -->
+    {% block head_script %}{# defer-incapable JS block #}{% endblock %}
+</head>
+<body>
+<!-- standard defer-capable js -->
+<script src="//code.jquery.com/jquery-{{jquery_ver}}.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/{{moment_ver}}/moment.min.js"></script>
+<!-- Language i18n {{locale}} -->
+<!-- global defer-capable js -->
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/{{angular_ver}}/angular.min.js" crossorigin="anonymous"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/{{angular_ver}}/angular-resource.min.js"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.5.0/angular-locale_{{session['user_locale']}}.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/{{angular_ver}}/angular-sanitize.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/{{materialize_ver}}/js/materialize.min.js"></script>
+
+<script>
+    var app = angular.module('tails', ['ngResource'])
+                     .config(['$interpolateProvider', function ($interpolateProvider) {
+                               $interpolateProvider.startSymbol('_{');
+                               $interpolateProvider.endSymbol('}_'); }
+                             ]);
+</script>
+<nav>
+    <div class="nav-wrapper">
+        <a href="https://tails.com"><img class="logo" src="static/img/logo-tm.svg" /></a>
+        <a href="#" class="login">Log In</a>
+        <h3 class="title">Pricing Test</h3>
+    </div>
+</nav>
+<!-- content  -->
+{% block content %}{# content block #}{% endblock %}
+<!-- footer -->
+{% block footer %}{# content-footer block #}{% endblock %}
+<!-- specic page defer-capable custom js -->
+{% block tail_script %}{# defer-capable JS block #}{% endblock %}
+</body>
+</html>

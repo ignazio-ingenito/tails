@@ -1,0 +1,204 @@
+{% extends "template.html" %}
+
+{% block searchbar %}
+{% endblock %}
+
+{% block style_block %}
+{% endblock %}
+
+{% block notification %}
+{% endblock %}
+
+{% block content %}
+<section class="section-content" ng-controller="tailsApp" ng-cloak>
+    <div class="currencies">
+        <h6 for="ddCurrecies">_{currencies[currency]['currencyName']}_ (GBP_{currency}_: _{rate}_)</h6>
+        <a class='dropdown-button btn' href='#' data-activates='ddCurrecies'>_{currency}_</a>
+        <ul id='ddCurrecies' class='dropdown-content'>
+            <li ng-repeat="c in currencies|toArray|orderBy:'id'">
+                <a href="#!" ng-click="currency_click(this)" data-value="_{c['id']}_">_{c['id']}_ - _{c['currencyName']}_</a>
+            </li>
+        </ul>
+    </div>
+	<div class="progress" ng-show="loading">
+		<div class="indeterminate"></div>
+	</div>
+    <div class="left">
+        <h5>Products</h5><br />
+        <ul class="collection" >
+          <li class="collection-item" ng-repeat="(k,v) in products">
+              <div class="productName">Products _{k}_</div>
+              <span>_{applyExchange(v['price'])}_</span> _{currency}_ + _{vat_bands[v['vat_band']]*100}_% VAT
+              <a class="btn-floating btn-small waves-effect waves-light add" ng-click="addProduct(k)"><i class="material-icons">add</i></a>
+              <a class="btn-floating btn-small waves-effect waves-light remove" ng-click="removeProduct(k)"><i class="material-icons">remove</i></a>
+          </li>
+        </ul>
+    </div>
+    <div class="right">
+        <h5>Basket</h5><br />
+        <ul class="collection" ng-if="(basket|toArray).length > 0">
+          <li class="collection-item" ng-repeat="(k,v) in basket">
+              <div class="productName">Products _{k}_</div>
+              <span>_{applyExchange(products[k]['price'])}_</span> _{currency}_ + _{vat_bands[products[k]['vat_band']]*100}_% VAT
+              <div class="qty">_{v}_</div>
+          </li>
+          <li class="collection-item">
+              <div class="productName">Total</div>
+              <span>_{total['order_total_price']}_</span> _{currency}_
+              + _{total['order_total_vat']}_ of VAT
+              = _{round(total['order_total_price']+total['order_total_vat'], 2)}_ _{currency}_
+          </li>
+        </ul>
+    </div>
+</section>
+{% endblock %}
+
+{% block tail_script%}
+<script>
+app.controller('tailsApp', function($scope, $http, $timeout) {
+    // Set the default values at startup
+    $scope.currency = "GBP";
+    $scope.rate = 1;
+    $scope.basket = {};
+    $scope.loading = true;
+	
+    /* Get the list of products */
+    var url = "{{url_for('api_v1.products')}}";
+    $http.get(url).then(function(data) {
+        $scope.products = data.data;
+    });
+
+    / *Get the list of vat_band */
+    var url = "{{url_for('api_v1.vat_bands')}}";
+    $http.get(url).then(function(data) {
+        $scope.vat_bands = data.data;
+    });
+
+    /* Get the list of currencies and init the dropdown */
+    var url = "{{url_for('api_v1.currencies')}}";
+    $http.get(url).then(function(data) {
+        $scope.currencies = data.data;
+
+        $timeout(function() {
+            $('.dropdown-button').dropdown({
+                inDuration: 300,
+                outDuration: 225,
+                constrainWidth: false, // Does not change width of dropdown to that of the activator
+                hover: true, // Activate on hover
+                gutter: 0, // Spacing from edge
+                belowOrigin: false, // Displays dropdown below the button
+                alignment: 'left', // Displays dropdown with edge aligned to the left of button
+                stopPropagation: false // Stops event propagation
+            });
+			
+			$scope.loading = false;
+        }, 0);
+    });
+
+    /* change the current currency */
+    $scope.currency_click = function(e) {
+		$scope.loading = true;
+        $scope.currency = e.c.id;
+        if ($scope.currency == "GBP") {
+            $scope.rate = 1;
+			$scope.loading = false;
+        }
+        else {
+            var url = "{{url_for('api_v1.currency_rate', currency=':currency')}}".replace(":currency", $scope.currency);
+            $http.get(url).then(function(data) {
+                $scope.rate = data.data;
+				$scope.loading = false;
+            });
+        }
+    }
+
+    /* calculate the price in the given currency */
+    $scope.applyExchange = function(price) {
+        return $scope.round(price * $scope.rate, 2);
+    }
+
+    /* round the price to the given decimal */
+    $scope.round = function(value, decimals) {
+        return Number((Math.round(value + "e" + decimals)  + "e-" + decimals));
+    }
+
+    /* add a product to the basket */
+    $scope.addProduct = function(prod_id) {
+        if (!(prod_id in $scope.basket))
+            $scope.basket[prod_id] = 1;
+        else
+            $scope.basket[prod_id] += 1;
+
+        //console.log('$scope.basket[' + prod_id + '] = ' + $scope.basket[prod_id]);
+        $scope.basket_total();
+    }
+
+    /* remove a product to the basket */
+    $scope.removeProduct = function(prod_id) {
+        if (!(prod_id in $scope.basket))
+            return;
+
+        if ($scope.basket[prod_id] > 1) {
+            $scope.basket[prod_id] -= 1;
+            //console.log('$scope.basket[' + prod_id + '] = ' + $scope.basket[prod_id]);
+        }
+        else {
+            delete $scope.basket[prod_id];
+            //console.log('$scope.basket[' + prod_id + '] = removed');
+        }
+
+        $scope.basket_total();
+    }
+
+    $scope.basket_total = function() {
+        var items = Object.keys($scope.basket).map(function(order_id) {
+            return {
+                "product_id": parseInt(order_id),
+                "quantity": $scope.basket[order_id],
+            }
+        });
+
+        var data = {
+            "order": {
+                "id": 12345,
+                "customer": {
+                    "customer_id": 1,
+                    "name": "Ignazio",
+                    "surname": "Ingenito",
+                },
+                "items": items,
+                "currency": $scope.currency,
+            }
+        }
+
+        var url = "{{url_for('api_v1.pricing_info')}}";
+        $http.post(url, data).then(
+            function(data) {
+                $scope.total = data.data;
+                console.log(data.data);
+            },
+            function(data) {
+                Materialize.toast(data.data, 3000);
+            }
+        );
+    }
+});
+
+app.filter('toArray', function () {
+    return function (obj, addKey) {
+        if (obj==null)
+            return;
+
+        if ( addKey === false ) {
+            return Object.keys(obj).map(function(key) {
+                return obj[key];
+            });
+        } else {
+            return Object.keys(obj).map(function (key) {
+                if(typeof obj[key] == 'object') return Object.defineProperty(obj[key], '$key', {enumerable: false, value: key});
+            });
+        }
+    }
+});
+</script>
+{% endblock %}
